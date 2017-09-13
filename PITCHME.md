@@ -21,8 +21,8 @@ The framework then automatically generates test cases that satisfy these constra
 runs tests to ensure that programs behave as specified
 
 +++
-- Haskell - QuickCheck ![Logo](assets/haskellLogo.png)
-- ScalaCheck ![Logo](assets/scalacheck.png)
+ ![Logo](assets/haskellLogo.png)
+ ![Logo](assets/scalacheck.png)
 ---
 ### A brief tour of property-based testing
 
