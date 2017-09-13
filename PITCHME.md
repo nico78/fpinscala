@@ -108,16 +108,10 @@ val prop =
 @[1](Gen[Int] , `Gen[List[Int]]`)
 
 +++
-### Recap
-
-And settled on the representation:
 
 ```scala
 def listOf[A]​(a: Gen[A]): Gen[List[A]]
 ```
-
-Note:
-
 
 +++
 ```scala
