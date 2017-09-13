@@ -22,9 +22,9 @@ runs tests to ensure that programs behave as specified
 
 +++
 
-![Logo](assets/down-arrow.png)
-![Logo](assets/haskellLogo.png)
-![Logo](assets/scalacheck.png)
+![Logo1](assets/down-arrow.png)
+![Logo2](assets/haskellLogo.png)
+![Logo3](assets/scalacheck.png)
 ---
 ### A brief tour of property-based testing
 
