@@ -38,7 +38,7 @@ val prop =
  forAll(intList)(ns => ns.headOption == ns.reverse.lastOption)
 ```
 @[1](A **generator** of lists of integers between 0 and 100.)
-@[2](A property that specifies the behavior of the List.reverse method.)
+@[2](A **property** that specifies the **behavior** of the List.reverse method.)
 @[3](Check that reversing a list twice gives back the original list)
 @[4](Check that the first element becomes the last element after reversal.)
 +++
@@ -98,11 +98,7 @@ it’s all even integers less than 100), we may exhaustively test all its values
 than generate sample values. If the property holds for all values in a domain, we
 have an actual proof, rather than just the absence of evidence to the contrary.
 
----
----
-### Choosing properties to test
-
-![Press Down Key](assets/down-arrow.png)
++++
 
 ### Choosing properties
 
@@ -113,7 +109,11 @@ See [Choosing properties for property-based testing](http://fsharpforfunandprofi
 - Idempotence |
 - "Hard to prove, easy to verify" - maze solution checker |
 - test oracle (test vs another implementation) |
+
+
 ---
+
+
 ### Choosing data types and functions
 
 ![Press Down Key](assets/down-arrow.png)
@@ -186,6 +186,14 @@ trait Prop {
 #### Implement &&
 +++
 
+```scala
+object Prop {
+  type SuccessCount = Int
+  ...
+}
+trait Prop { def check: Either[]???, SuccessCount] }
+```
+@[1](Alias helps readability of API`)
 
 
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
