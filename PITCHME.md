@@ -63,9 +63,9 @@ scala> failingProp.check
 ```scala
 sum: List[Int] => Int
 ```
-- ?
+- ? |
 - Reversing a list and summing it should give the same result as summing the
-original, nonreversed list. |
+original, nonreversed list |
 - What should the sum be if all elements of the list are the same value? |
 
 
