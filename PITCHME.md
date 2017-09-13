@@ -37,7 +37,7 @@ val prop =
  forAll(intList)(ns => ns.reverse.reverse == ns) &&
  forAll(intList)(ns => ns.headOption == ns.reverse.lastOption)
 ```
-@[1](A generator of lists of integers between 0 and 100.)
+@[1](A **generator** of lists of integers between 0 and 100.)
 @[2](A property that specifies the behavior of the List.reverse method.)
 @[3](Check that reversing a list twice gives back the original list)
 @[4](Check that the first element becomes the last element after reversal.)
@@ -99,9 +99,14 @@ than generate sample values. If the property holds for all values in a domain, w
 have an actual proof, rather than just the absence of evidence to the contrary.
 
 ---
+---
+### Choosing properties to test
+
+![Press Down Key](assets/down-arrow.png)
+
 ### Choosing properties
 
-[Choosing properties for property-based testing](http://fsharpforfunandprofit.com/posts/property-based-testing-2/)
+See [Choosing properties for property-based testing](http://fsharpforfunandprofit.com/posts/property-based-testing-2/)
 - "Different paths, same destination" - combining operations in different orders |
 - "There and back again" - reversing operations |
 - Checking invariants |
