@@ -152,11 +152,13 @@ can see that it accepts a Gen[List[Int]] and what looks to be a corresponding pr
 cate, List[Int] => Boolean . But again, it doesn’t seem like forAll should care about
 the types of the generator and the predicate, as long as they match up. We can express
 this with the type:
++++
 #### Prop
 We don't know what **Prop** will look like yet but we know it needs an **&&** combinator
 ```scala
 trait Prop {def &&(p: Prop): Prop }
 ```
++++
 #### Prop
 ... and we know it needs **check**
 ```scala
@@ -167,7 +169,19 @@ trait Prop {
 ```
 - .. But because it returns **Unit**, the only option for **&&** is to run both **check** methods |
 - which would suck |
----
++++
+.. so let's try returning Boolean..
+```scala
+trait Prop {
+  def check: Boolean
+  def &&(p: Prop): Prop
+}
+```
+### Exercise 8.3
+#### Implement &&
++++
+
+
 
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
