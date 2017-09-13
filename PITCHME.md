@@ -12,7 +12,7 @@
 +++
 - Technique for testing **laws** or **invariants** about the behaviour of your code |
 - Decoupling specification of program behaviour from creation of test cases |
----
++++
 - The programmer focuses on specifying domain, behaviour and high-level constraints |
 - The framework generates test cases |
 
@@ -35,17 +35,19 @@ val prop =
 @[2](A property that specifies the behavior of the List.reverse method.)
 @[3](Check that reversing a list twice gives back the original list)
 @[4](Check that the first element becomes the last element after reversal.)
----
++++
 
 ```scala
 val failingProp = forAll(intList)(ns => ns.reverse == ns)
 ```
 A property that is obviously false
----
++++
 
 ### Generators, predicates & properties
 ![Logo](assets/generatorsProperties.png)
 - A Gen object generates a variety of different objects to pass to a Boolean expression searching for one that makes it false |
+
+
 ---
 
 +++
