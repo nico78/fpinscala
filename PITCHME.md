@@ -22,9 +22,8 @@ runs tests to ensure that programs behave as specified
 
 +++
 
-![Logo1](assets/down-arrow.png)
-![Logo2](assets/haskellLogo.png)
-![Logo3](assets/scalacheck.png)
+- Haskell QuickCheck ![Logo2](assets/haskellLogo.png)
+- ScalaCheck ![Logo3](assets/scalacheck.png)
 ---
 ### A brief tour of property-based testing
 
