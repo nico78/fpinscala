@@ -47,19 +47,19 @@ A property that is obviously false
 ![Logo](assets/generatorsProperties.png)
 - Gen generates a variety of objects to pass to a Boolean expression searching for one giving false |
 ---
+<div class="fragment">
 ```scala
-prop.check
-```
-```
+scala> prop.check
 OK, passed 100 tests
 ```
+</div>
+<div class="fragment">
 ```scala
-failingProp.check
-```
-```
+scala> failingProp.check
 ! Falsified after 6 passed tests.
 > ARG_0: List(0, 1)
 ```
+</div>
 +++
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
