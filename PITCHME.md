@@ -108,13 +108,16 @@ val prop =
 @[1](Gen[Int] , `Gen[List[Int]]`)
 
 +++
+
 ```scala
 def listOf[A](a: Gen[A]): Gen[List[A]]
 ```
+
 +++
 ```scala
 def listOfN[A](n: Int, a: Gen[A]): Gen[List[A]]
 ```
++++
 
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
