@@ -203,7 +203,7 @@ object Prop {
 }
 ```
 @[2](A String representation will do for a failure)
-
++++
 ```scala
 trait Prop {
   def check: Either[(FailedCase, SuccessCount), SuccessCount]
@@ -211,7 +211,7 @@ trait Prop {
 returns either:
 - Failure case description and Success count before failure, |
 - or just total success count |
-
++++
 
 
 
