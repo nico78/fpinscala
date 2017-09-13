@@ -122,21 +122,35 @@ val prop =
  forAll(intList)(ns => ns.headOption == ns.reverse.lastOption)
 ```
 @[1](Gen[Int] , `Gen[List[Int]]`)
-#### Gen
 +++
+#### Gen
 Let's make `listOf` polymorphic
 ```scala
 def listOf[A]​(a: Gen[A]): Gen[List[A]]
 ```
+- But we can see from signature that it can't be told the size... |
 +++
+listOf with size:
 ```scala
 def listOfN[A]​(n: Int, a: Gen[A]): Gen[List[A]]
 ```
-- useful to have this, but we might not want size to be exposed to user, just test runner |
+- useful to have this, but we might not want to have to specify it |
+- probably don't want size to be exposed to user, just test runner |
 - will keep it in mind... |
 +++
 
+#### What about forAll ?
+```scala
+def forAll[A](a: Gen[A])(f: A => Boolean): Prop
+```
+so A `Prop` binds a `Gen` to a **predicate**
 
+Note:
+The forAll function looks interesting. We
+can see that it accepts a Gen[List[Int]] and what looks to be a corresponding predi-
+cate, List[Int] => Boolean . But again, it doesn’t seem like forAll should care about
+the types of the generator and the predicate, as long as they match up. We can express
+this with the type:
 
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
