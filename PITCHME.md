@@ -57,7 +57,7 @@ scala> failingProp.check
 ### Generators, predicates & properties
 ![Logo](assets/generatorsProperties.png)
 ###### Gen generates a variety of objects to pass to a Boolean expression searching for one that makes it false
----
++++
 ### Exercise 8.1
 - What properties specify sum?
 ```scala
@@ -66,10 +66,16 @@ sum: List[Int] => Int
 - Reversing a list and summing it should give the same result as summing the original nonreversed list |
 - What should the sum be if all elements of the list are the same value? |
 
-
-
-
-
++++
+### Exercise 8.2
+What about max?
+```scala
+max: List[Int] => Int
+```
+- The max of a single element list is equal to that element. |
+- The max of a list is greater than or equal to all elements of the list. |
+- The max of a list is an element of that list. |
+- The max of the empty list is unspecified and should throw an error or return `None`. |
 
 +++
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
