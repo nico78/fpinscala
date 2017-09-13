@@ -1,15 +1,50 @@
-# Nic's Code
-# Presenting
+# Functional Programming in Scala
+# Chapter 8 - Property-Based Testing
 
 ---
 
-### Code-Blocks
+### Property-Based Testing
 
-#### The Basics
+#### What is it?
 
 ![Press Down Key](assets/down-arrow.png)
 
 +++
+- Technique for testing *laws* or *invariants* about the behaviour of your code |
+- Decoupling specification of program behaviour from creation of test cases |
+---
+- The programmer focuses on specifying domain, behaviour and high-level constraints
+- The framework generates test cases
+
+Note:
+The framework then automatically generates test cases that satisfy these constraints, and
+runs tests to ensure that programs behave as specified
+
++++
+#### A brief tour of property-based testing
+
+![Press Down Key](assets/down-arrow.png)
+---
+```scala
+val intList = Gen.listOf(Gen.choose(0,100))
+val prop =
+ forAll(intList)(ns => ns.reverse.reverse == ns) &&
+ forAll(intList)(ns => ns.headOption == ns.reverse.lastOption)
+```
+@[1](A generator of lists of integers between 0 and 100.)
+@[2](A property that specifies the behavior of the List.reverse method.)
+@[3](Check that reversing a list twice gives back the original list)
+@[4](Check that the first element becomes the last element after reversal.)
+---
+
+```scala
+val failingProp = forAll(intList)(ns => ns.reverse == ns)
+```
+A property that is obviously false
++++
+#### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
+
+
 
 ```python
 from time import localtime
@@ -62,7 +97,7 @@ else:
 @[6-7]
 @[9-14]
 
-###### Use code-presenting to **step-thru** code <p> from directly within your presentation 
+###### Use code-presenting to **step-thru** code <p> from directly within your presentation
 
 
 ---
@@ -135,7 +170,7 @@ else:
 @[10-16]
 @[18-24]
 
-###### Use code-presenting to **step-thru** code <p> from directly within your presentation 
+###### Use code-presenting to **step-thru** code <p> from directly within your presentation
 
 ---
 
