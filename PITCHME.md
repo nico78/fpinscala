@@ -56,7 +56,21 @@ scala> failingProp.check
 +++
 ### Generators, predicates & properties
 ![Logo](assets/generatorsProperties.png)
-####### Gen generates a variety of objects to pass to a Boolean expression searching for one that makes it false
+###### Gen generates a variety of objects to pass to a Boolean expression searching for one that makes it false
+---
+### Exercise 8.1
+What properties specify sum?
+```scala
+sum: List[Int] => Int
+```
+- Reversing a list and summing it should give the same result as summing the
+original, nonreversed list. |
+- What should the sum be if all elements of the list are the same value? |
+
+
+
+
+
 
 +++
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
