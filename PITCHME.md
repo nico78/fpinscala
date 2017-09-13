@@ -59,10 +59,11 @@ scala> failingProp.check
 ###### Gen generates a variety of objects to pass to a Boolean expression searching for one that makes it false
 ---
 ### Exercise 8.1
-What properties specify sum?
+- What properties specify sum?
 ```scala
 sum: List[Int] => Int
 ```
+- ?
 - Reversing a list and summing it should give the same result as summing the
 original, nonreversed list. |
 - What should the sum be if all elements of the list are the same value? |
