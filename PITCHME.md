@@ -191,11 +191,35 @@ object Prop {
   type SuccessCount = Int
   ...
 }
-trait Prop { def check: Either[]???, SuccessCount] }
+trait Prop { def check: Either[???, SuccessCount] }
 ```
-@[1](Alias helps readability of API`)
+@[2](Alias helps readability of API)
++++
+
+```scala
+object Prop {
+  type FailedCase = String
+  type SuccessCount = Int
+}
+```
+@[2](A String representation will do for a failure)
+
+```scala
+trait Prop {
+  def check: Either[(FailedCase, SuccessCount), SuccessCount]
+}```
+@[2](Success count before failure, or just total success count)
 
 
+
+
+
+
+
+
+
+
+---
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
 
