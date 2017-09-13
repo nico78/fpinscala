@@ -65,7 +65,8 @@ sum: List[Int] => Int
 ```
 - Reversing a list and summing it should give the same result as summing the original nonreversed list |
 - What should the sum be if all elements of the list are the same value? |
-
+Note:
+just high-level description
 +++
 ### Exercise 8.2
 #### What about max?
@@ -90,7 +91,31 @@ by some Gen[A] the domain. 2 When the domain is small enough (for instance, if
 it’s all even integers less than 100), we may exhaustively test all its values, rather
 than generate sample values. If the property holds for all values in a domain, we
 have an actual proof, rather than just the absence of evidence to the contrary.
+
+---
+### Choosing data types and functions
+
+![Press Down Key](assets/down-arrow.png)
+
 +++
+#### What data types should we use? *Gen*
+```scala
+val intList = Gen.listOf(Gen.choose(0,100))
+val prop =
+ forAll(intList)(ns => ns.reverse.reverse == ns) &&
+ forAll(intList)(ns => ns.headOption == ns.reverse.lastOption)
+```
+@[1](Gen[Int] , `Gen[List[Int]]`)
+
++++
+```scala
+def listOf[A](a: Gen[A]): Gen[List[A]]
+```
++++
+```scala
+def listOfN[A](n: Int, a: Gen[A]): Gen[List[A]]
+```
+
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
 
