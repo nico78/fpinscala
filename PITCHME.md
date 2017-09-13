@@ -1,5 +1,5 @@
-# Functional Programming in Scala
-# Chapter 8 - Property-Based Testing
+## Functional Programming in Scala
+### Chapter 8 - Property-Based Testing
 
 ---
 
@@ -10,21 +10,21 @@
 ![Press Down Key](assets/down-arrow.png)
 
 +++
-- Technique for testing *laws* or *invariants* about the behaviour of your code |
+- Technique for testing **laws** or **invariants** about the behaviour of your code |
 - Decoupling specification of program behaviour from creation of test cases |
 ---
-- The programmer focuses on specifying domain, behaviour and high-level constraints
-- The framework generates test cases
+- The programmer focuses on specifying domain, behaviour and high-level constraints |
+- The framework generates test cases |
 
 Note:
 The framework then automatically generates test cases that satisfy these constraints, and
 runs tests to ensure that programs behave as specified
 
-+++
+---
 #### A brief tour of property-based testing
 
 ![Press Down Key](assets/down-arrow.png)
----
++++
 ```scala
 val intList = Gen.listOf(Gen.choose(0,100))
 val prop =
@@ -40,7 +40,9 @@ val prop =
 ```scala
 val failingProp = forAll(intList)(ns => ns.reverse == ns)
 ```
-A property that is obviously false
+###### A property that is obviously false
+---
+---?image=assets/generatorsProperties.png
 +++
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
