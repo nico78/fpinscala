@@ -20,6 +20,9 @@ Note:
 The framework then automatically generates test cases that satisfy these constraints, and
 runs tests to ensure that programs behave as specified
 
++++
+- Haskell - QuickCheck ![Logo](assets/haskellLogo.png)
+- ScalaCheck ![Logo](assets/scalacheck.png)
 ---
 ### A brief tour of property-based testing
 
@@ -93,12 +96,22 @@ than generate sample values. If the property holds for all values in a domain, w
 have an actual proof, rather than just the absence of evidence to the contrary.
 
 ---
+### Choosing properties
+
+[Choosing properties for property-based testing] (http://fsharpforfunandprofit.com/posts/property-based-testing-2/)
+- "Different paths, same destination" - combining operations in different orders |
+- "There and back again" - reversing operations |
+- Checking invariants |
+- Idempotence |
+- "Hard to prove, easy to verify" - maze solution checker |
+- test oracle (test vs another implementation) |
+---
 ### Choosing data types and functions
 
 ![Press Down Key](assets/down-arrow.png)
 
 +++
-#### What data types should we use? *Gen*
+#### What data types should we use?
 ```scala
 val intList = Gen.listOf(Gen.choose(0,100))
 val prop =
@@ -106,19 +119,21 @@ val prop =
  forAll(intList)(ns => ns.headOption == ns.reverse.lastOption)
 ```
 @[1](Gen[Int] , `Gen[List[Int]]`)
-
+#### Gen
 +++
 Let's make `listOf` polymorphic
 ```scala
 def listOf[A]​(a: Gen[A]): Gen[List[A]]
 ```
-
 +++
 ```scala
 def listOfN[A]​(n: Int, a: Gen[A]): Gen[List[A]]
 ```
-- It's useful to have this, but we might not want size to be exposed to user, just test runner |
+- useful to have this, but we might not want size to be exposed to user, just test runner |
+- will keep it in mind... |
 +++
+
+
 
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
