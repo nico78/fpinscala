@@ -108,15 +108,16 @@ val prop =
 @[1](Gen[Int] , `Gen[List[Int]]`)
 
 +++
-
+Let's make `listOf` polymorphic
 ```scala
 def listOf[A]​(a: Gen[A]): Gen[List[A]]
 ```
 
 +++
 ```scala
-def listOfN[A](n: Int, a: Gen[A]): Gen[List[A]]
+def listOfN[A]​(n: Int, a: Gen[A]): Gen[List[A]]
 ```
+- It's useful to have this, but we might not want size to be exposed to user, just test runner |
 +++
 
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
