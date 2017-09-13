@@ -12,7 +12,7 @@
 +++
 - Technique for testing **laws** or **invariants** about the behaviour of your code |
 - Decoupling specification of program behaviour from creation of test cases |
-+++
+---
 - The programmer focuses on specifying domain, behaviour and high-level constraints |
 - The framework generates test cases |
 
@@ -41,7 +41,7 @@ val prop =
 scala> prop.check
 OK, passed 100 tests
 ```
-+++
+---
 ```scala
 val failingProp = forAll(intList)(ns => ns.reverse == ns)
 ```
@@ -53,7 +53,7 @@ scala> failingProp.check
 ! Falsified after 6 passed tests.
 > ARG_0: List(0, 1)
 ```
-+++
+---
 ### Generators, predicates & properties
 ![Logo](assets/generatorsProperties.png)
 ###### Gen generates a variety of objects to pass to a Boolean expression searching for one that makes it false
@@ -63,12 +63,8 @@ scala> failingProp.check
 ```scala
 sum: List[Int] => Int
 ```
-- ? |
-- Reversing a list and summing it should give the same result as summing the
-original, nonreversed list |
+- Reversing a list and summing it should give the same result as summing the original nonreversed list |
 - What should the sum be if all elements of the list are the same value? |
-
-
 
 
 
