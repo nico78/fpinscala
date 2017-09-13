@@ -56,7 +56,7 @@ scala> failingProp.check
 +++
 ### Generators, predicates & properties
 ![Logo](assets/generatorsProperties.png)
-- Gen generates a variety of objects to pass to a Boolean expression searching for one giving false |
+###### Gen generates a variety of objects to pass to a Boolean expression searching for one giving false |
 
 +++
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
