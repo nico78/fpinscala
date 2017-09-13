@@ -208,7 +208,9 @@ object Prop {
 trait Prop {
   def check: Either[(FailedCase, SuccessCount), SuccessCount]
 }```
-@[2](Success count before failure, or just total success count)
+returns either:
+- Failure case description and Success count before failure, |
+- or just total success count |
 
 
 
