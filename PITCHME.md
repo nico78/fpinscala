@@ -108,10 +108,21 @@ val prop =
 @[1](Gen[Int] , `Gen[List[Int]]`)
 
 +++
+### Recap
+
+And settled on the representation:
 
 ```scala
-def listOf[A](a: Gen[A]): Gen[List[A]]
+type Par[A] = ExecutorService => Future[A]
+
+def unit[A]​(a: A): Par[A]
+def fork[A]​(p: Par[A]): Par[A]
+def map2[A, B, C]​(a: Par[A], b: Par[B])(f: (A, B) => C): Par[C]
+def run[A]​(s: ExecutorService)(p: Par[A]): Future[A]
 ```
+
+Note:
+
 
 +++
 ```scala
