@@ -79,7 +79,7 @@ just high-level description
 ```scala
 max: List[Int] => Int
 ```
-- The max of the empty list is unspecified and should throw an error or return `None` |
+- The max of the empty list is unspecified and should throw an error or return None |
 - The max of a single element list is equal to that element. |
 - The max of a list is greater than or equal to all elements of the list. |
 - The max of a list is an element of that list. |
@@ -135,11 +135,12 @@ listOf with size:
 def listOfN[A]​(n: Int, a: Gen[A]): Gen[List[A]]
 ```
 - useful to have this, but we might not want to have to specify it |
-- probably don't want size to be exposed to user, just test runner |
+- probably don't want size to be exposed to user, just test runner, for minimization|
 - will keep it in mind... |
 +++
 
 #### What about forAll ?
+We can define signature:
 ```scala
 def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
 ```
@@ -151,6 +152,22 @@ can see that it accepts a Gen[List[Int]] and what looks to be a corresponding pr
 cate, List[Int] => Boolean . But again, it doesn’t seem like forAll should care about
 the types of the generator and the predicate, as long as they match up. We can express
 this with the type:
+#### Prop
+We don't know what **Prop** will look like yet but we know it needs an **&&** combinator
+```scala
+trait Prop {def &&(p: Prop): Prop }
+```
+#### Prop
+... and we know it needs **check**
+```scala
+trait Prop {
+  def check: Unit
+  def &&(p: Prop): Prop
+}
+```
+- .. But because it returns **Unit**, the only option for **&&** is to run both **check** methods |
+- which would suck |
+---
 
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
