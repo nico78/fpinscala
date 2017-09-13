@@ -59,7 +59,7 @@ scala> failingProp.check
 ###### Gen generates a variety of objects to pass to a Boolean expression searching for one that makes it false
 +++
 ### Exercise 8.1
-- What properties specify sum?
+#### What properties specify sum?
 ```scala
 sum: List[Int] => Int
 ```
@@ -68,15 +68,28 @@ sum: List[Int] => Int
 
 +++
 ### Exercise 8.2
-What about max?
+#### What about max?
 ```scala
 max: List[Int] => Int
 ```
+- The max of the empty list is unspecified and should throw an error or return `None` |
 - The max of a single element list is equal to that element. |
 - The max of a list is greater than or equal to all elements of the list. |
 - The max of a list is an element of that list. |
-- The max of the empty list is unspecified and should throw an error or return `None`. |
-
++++
+### Other features
+- Test case minimization
+- Exhaustive test case generation
+Note:
+- Test case minimization—In the event of a failing test, the framework tries smaller
+sizes until it finds the smallest test case that also fails, which is more illuminating
+for debugging purposes. For instance, if a property fails for a list of size 10, the
+framework tries smaller lists and reports the smallest list that fails the test.
+- Exhaustive test case generation—We call the set of values that could be produced
+by some Gen[A] the domain. 2 When the domain is small enough (for instance, if
+it’s all even integers less than 100), we may exhaustively test all its values, rather
+than generate sample values. If the property holds for all values in a domain, we
+have an actual proof, rather than just the absence of evidence to the contrary.
 +++
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
