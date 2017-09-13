@@ -42,9 +42,12 @@ val failingProp = forAll(intList)(ns => ns.reverse == ns)
 ```
 A property that is obviously false
 ---
+
+###Generators, predicates & properties
 ![Logo](assets/generatorsProperties.png)
+A Gen object generates a variety of different objects to pass to a Boolean expression searching for one that makes it false |
 ---
----?image=assets/generatorsProperties.png
+
 +++
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
