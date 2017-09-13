@@ -43,9 +43,9 @@ val failingProp = forAll(intList)(ns => ns.reverse == ns)
 A property that is obviously false
 ---
 
-###Generators, predicates & properties
+### Generators, predicates & properties
 ![Logo](assets/generatorsProperties.png)
-A Gen object generates a variety of different objects to pass to a Boolean expression searching for one that makes it false |
+- A Gen object generates a variety of different objects to pass to a Boolean expression searching for one that makes it false |
 ---
 
 +++
