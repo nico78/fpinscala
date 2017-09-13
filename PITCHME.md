@@ -142,9 +142,10 @@ def listOfN[A]​(n: Int, a: Gen[A]): Gen[List[A]]
 #### What about forAll ?
 ```scala
 def listOf[A]​(a: Gen[A]): Gen[List[A]]
+def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
 def forAll[A](a: Gen[A])(f: A => Boolean): Prop
 ```
-so A `Prop` binds a `Gen` to a **predicate**
+so a **Prop** binds a **Gen** to a **predicate**
 
 Note:
 The forAll function looks interesting. We
