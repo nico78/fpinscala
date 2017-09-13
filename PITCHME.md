@@ -98,7 +98,7 @@ have an actual proof, rather than just the absence of evidence to the contrary.
 ---
 ### Choosing properties
 
-[Choosing properties for property-based testing] (http://fsharpforfunandprofit.com/posts/property-based-testing-2/)
+[Choosing properties for property-based testing](http://fsharpforfunandprofit.com/posts/property-based-testing-2/)
 - "Different paths, same destination" - combining operations in different orders |
 - "There and back again" - reversing operations |
 - Checking invariants |
