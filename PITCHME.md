@@ -113,12 +113,7 @@ val prop =
 And settled on the representation:
 
 ```scala
-type Par[A] = ExecutorService => Future[A]
-
 def listOf[A]​(a: Gen[A]): Gen[List[A]]
-def fork[A]​(p: Par[A]): Par[A]
-def map2[A, B, C]​(a: Par[A], b: Par[B])(f: (A, B) => C): Par[C]
-def run[A]​(s: ExecutorService)(p: Par[A]): Future[A]
 ```
 
 Note:
