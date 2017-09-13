@@ -40,7 +40,9 @@ val prop =
 ```scala
 val failingProp = forAll(intList)(ns => ns.reverse == ns)
 ```
-###### A property that is obviously false
+A property that is obviously false
+---
+![Logo](assets/generatorsProperties.png)
 ---
 ---?image=assets/generatorsProperties.png
 +++
