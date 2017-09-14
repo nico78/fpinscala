@@ -244,7 +244,8 @@ Gen[A]
 +++
 #### A representation for Gen
 ```scala
-  case class Gen[A](sample: State[RNG, A])
+  def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
+  case class Gen[A] (sample: State[RNG, A])
 ```
 It simply wraps `State[RNG,A]` so combinators should be simple delegations to State
 +++
