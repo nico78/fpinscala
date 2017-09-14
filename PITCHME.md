@@ -292,7 +292,7 @@ How can we combine them?
 ### Exercise 8.6
 #### Implement `flatMap` and a dynamic listOfN
 ```scala
-class Gen[A] {
+case class Gen[A] (sample: State[RNG, A]) {
   ...
   def flatMap[B](f: A => Gen[B]): Gen[B]
 
@@ -300,152 +300,37 @@ class Gen[A] {
 
 }
 ```
-
 +++
-
-```python
-from time import localtime
-
-activities = {8: 'Sleeping', 9: 'Commuting', 17: 'Working',
-              18: 'Commuting', 20: 'Eating', 22: 'Resting' }
-
-time_now = localtime()
-hour = time_now.tm_hour
-
-for activity_time in sorted(activities.keys()):
-    if hour < activity_time:
-        print activities[activity_time]
-        break
-else:
-    print 'Unknown, AFK or sleeping!'
+### Exercise 8.7
+#### Implement `union` - pulls from each with equal likelihood
+```scala
+case class Gen[A] (sample: State[RNG, A]) {
+  ...
+  def union[A](g1: Gen[A], g2: Gen[A]]): Gen[A]
+}
 ```
-
-###### Code-blocks let you present any <p> **static code** with auto-syntax highlighting
-
----
-
-### Code-Blocks
-##### Using
-#### **Code-Presenting**
-
-![Press Down Key](assets/down-arrow.png)
-
 +++
+### Exercise 8.8
+#### Implement `weighted` 
+A version of union that accepts a weight for each Gen and generates values from each Gen with probability proportional to its weight.
 
-```python
-from time import localtime
-
-activities = {8: 'Sleeping', 9: 'Commuting', 17: 'Working',
-              18: 'Commuting', 20: 'Eating', 22: 'Resting' }
-
-time_now = localtime()
-hour = time_now.tm_hour
-
-for activity_time in sorted(activities.keys()):
-    if hour < activity_time:
-        print activities[activity_time]
-        break
-else:
-    print 'Unknown, AFK or sleeping!'
+```scala
+case class Gen[A] (sample: State[RNG, A]) {
+  ...
+  def union[A](g1: Gen[A], g2: Gen[A]]): Gen[A]
+}
 ```
-
-@[1]
-@[3-4]
-@[6-7]
-@[9-14]
-
-###### Use code-presenting to **step-thru** code <p> from directly within your presentation
-
-
 ---
+### Back to Prop
 
-### Code-Blocks
-##### Using
-#### Code-Presenting
-#### **With Annotations**
+Currently our **Prop** looks like this:
 
-![Press Down Key](assets/down-arrow.png)
+```scala
+trait Prop {
+  def check: Either[(FailedCase, SuccessCount), SuccessCount]
+}```
 
-+++
+@[2](Any trait that implements a single no-args method returning **A** is equivalent to a non-strict (lazy) **A**) 
+- so **Prop** is currently a lazy Either
 
-```python
-from time import localtime
-
-activities = {8: 'Sleeping', 9: 'Commuting', 17: 'Working',
-              18: 'Commuting', 20: 'Eating', 22: 'Resting' }
-
-time_now = localtime()
-hour = time_now.tm_hour
-
-for activity_time in sorted(activities.keys()):
-    if hour < activity_time:
-        print activities[activity_time]
-        break
-else:
-    print 'Unknown, AFK or sleeping!'
-```
-
-@[1](Python from..import statement)
-@[3-4](Python dictionary initialization block)
-@[6-7](Python working with time)
-@[9-14](Python for..else statement)
-
----
-
-### Naturally
-### Code-Presenting
-### works in exactly the same way on [Code-Delimiter Slides](https://github.com/gitpitch/gitpitch/wiki/Code-Delimiter-Slides) as it does on [Code-Blocks](https://github.com/gitpitch/gitpitch/wiki/Code-Slides).
-
----
-
-### Code-Delimiter Slides
-
-```
-                  ---?code=path/to/source.file
-```
-
-#### The Basics
-
-![Press Down Key](assets/down-arrow.png)
-
-+++?code=src/python/time.py&lang=python
-
-###### Code delimiters let you present any <p> **code file** with auto-syntax highlighting
-
----
-
-### Code-Delimiter Slides
-##### Using
-#### **Code-Presenting**
-
-![Press Down Key](assets/down-arrow.png)
-
-+++?code=src/javascript/config.js&lang=javascript
-
-@[1-3]
-@[5-8]
-@[10-16]
-@[18-24]
-
-###### Use code-presenting to **step-thru** code <p> from directly within your presentation
-
----
-
-### Code-Delimiter Slides
-##### Using
-#### Code-Presenting
-#### **With Annotations**
-
-![Press Down Key](assets/down-arrow.png)
-
-+++?code=src/elixir/monitor.ex&lang=elixir
-
-@[11-14](Elixir module-attributes as constants)
-@[22-28](Elixir with-statement for conciseness)
-@[171-177](Elixir case-statement pattern matching)
-@[179-185](Elixir pipe-mechanism for composing functions)
-
----
-
-### Learn By Example
-#### View The [Presentation Markdown](https://github.com/gitpitch/code-presenting/blob/master/PITCHME.md)
+What's missing?
