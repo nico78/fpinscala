@@ -311,8 +311,6 @@ case class Gen[A] (sample: State[RNG, A]) {
 case class Gen[A] (sample: State[RNG, A]) {
   ...
   def union[A]​(g1: Gen[A], g1: Gen[A]): Gen[A]
-
-  def union[A](g1: Gen[A], g2: Gen[A]]): Gen[A]
 }
 ```
 +++
@@ -323,7 +321,7 @@ A version of union that accepts a weight for each Gen and generates values from 
 ```scala
 case class Gen[A] (sample: State[RNG, A]) {
   ...
-  def union[A](g1: Gen[A], g2: Gen[A]]): Gen[A]
+  def weighted[A]​(g1: (Gen[A], Double), g2: (Gen[A], Double)): Gen[A]
 }
 ```
 ---
