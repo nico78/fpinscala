@@ -244,7 +244,7 @@ Gen[A]
 +++
 #### A representation for Gen
 ```scala
-[A]
+val Gen[A]
 ```
 It simply wraps `State[RNG,A]` so combinators should be simple delegations to State
 +++
