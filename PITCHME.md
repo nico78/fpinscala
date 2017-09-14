@@ -330,17 +330,16 @@ trait Prop {
   def check: Either[(FailedCase, SuccessCount), SuccessCount]
 }```
 
-@[2](Any trait that implements a single no-args method returning **A** is equivalent to a non-strict (lazy) **A**)
+Any trait that implements a single no-args method returning **A** is equivalent to a non-strict (lazy) **A**)
 +++
 ### Back to Prop
 
-Currently our **Prop** looks like this:
 
 ```scala
 trait Prop {
   def check: Either[(FailedCase, SuccessCount), SuccessCount]
 }```
-- so **Prop** is currently a lazy Either
+so **Prop** is currently a lazy Either |
 +++
 ```scala
 trait Prop {
