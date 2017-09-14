@@ -276,13 +276,16 @@ def listOfN[A]​(n: Int, g: Gen[A]): Gen[List[A]]​
 ### Generators that depend on generated values
 
 ```scala
-// generates pairs of strings - second contains chars from first
+// generates pairs of strings
+// second contains chars from first
 val strCharPairs : Gen[(String, String)]
 
 
 val listLengthGenerator: Gen[Int]
 
-val doubleLists: Gen[List[Double]] //generates lists of lengths from listLengthGenerator
+//generates lists of lengths
+//from listLengthGenerator
+val doubleLists: Gen[List[Double]]
 ```
 How can we combine them?
 
@@ -295,6 +298,8 @@ How can we combine them?
 ```scala
 case class Gen[A] (sample: State[RNG, A]) {
   ...
+  def flatMap[B]​(f: A => Gen[B]): Gen[B]
+
   def flatMap[B](f: A => Gen[B]): Gen[B]
   def listOfN(size: Gen[Int]): Gen[List[A]]
 
