@@ -311,7 +311,7 @@ case class Gen[A] (sample: State[RNG, A]) {
 ```
 +++
 ### Exercise 8.8
-#### Implement `weighted` 
+#### Implement `weighted`
 A version of union that accepts a weight for each Gen and generates values from each Gen with probability proportional to its weight.
 
 ```scala
@@ -330,7 +330,23 @@ trait Prop {
   def check: Either[(FailedCase, SuccessCount), SuccessCount]
 }```
 
-@[2](Any trait that implements a single no-args method returning **A** is equivalent to a non-strict (lazy) **A**) 
-- so **Prop** is currently a lazy Either
+@[2](Any trait that implements a single no-args method returning **A** is equivalent to a non-strict (lazy) **A**)
++++
+### Back to Prop
 
+Currently our **Prop** looks like this:
+
+```scala
+trait Prop {
+  def check: Either[(FailedCase, SuccessCount), SuccessCount]
+}```
+- so **Prop** is currently a lazy Either
++++
+```scala
+trait Prop {
+  def check: Either[(FailedCase, SuccessCount), SuccessCount]
+}```
 What's missing?
+- We don't know how to specify what constitutes "success" - "how many test cases need to pass"? |
+- rather than hardcode, we'll abstract over the dependency:
++++
