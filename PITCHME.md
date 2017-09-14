@@ -258,7 +258,7 @@ def choose(start: Int, stopExclusive: Int): Gen[Int]
 #### Try implementing `unit`, `boolean`, `listOfN`
 ```scala
 // always generates value a
-def unit[A](a: => A):Gen[A]
+
 
 def boolean: Gen[Boolean]
 
