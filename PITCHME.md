@@ -117,16 +117,18 @@ See [Choosing properties for property-based testing](http://fsharpforfunandprofi
 ### Choosing data types and functions
 
 ![Press Down Key](assets/down-arrow.png)
-
 +++
-#### What data types should we use?
+The messy and iterative process of discovering data types and functions for our library
+
+#### Initial snippets of the API
+##### What data types should we use?
 ```scala
 val intList = Gen.listOf(Gen.choose(0,100))
 val prop =
  forAll(intList)(ns => ns.reverse.reverse == ns) &&
  forAll(intList)(ns => ns.headOption == ns.reverse.lastOption)
 ```
-@[1](Gen[Int] , `Gen[List[Int]]`)
+@[1](Looks like these should be choose: `Gen[Int]` , listOf: `Gen[List[Int]]`)
 +++
 #### Gen
 Let's make `listOf` polymorphic
@@ -157,8 +159,12 @@ can see that it accepts a Gen[List[Int]] and what looks to be a corresponding pr
 cate, List[Int] => Boolean . But again, it doesn’t seem like forAll should care about
 the types of the generator and the predicate, as long as they match up. We can express
 this with the type:
-+++
-#### Prop
+
+
+---
+
+
+#### Meaning and API of properties
 We don't know what **Prop** will look like yet but we know it needs an **&&** combinator
 ```scala
 trait Prop {def &&(p: Prop): Prop }
@@ -183,7 +189,7 @@ trait Prop {
 }
 ```
 ### Exercise 8.3
-#### Implement &&
+#### Implement && on Prop
 +++
 
 ```scala
@@ -213,18 +219,89 @@ returns either:
 - or just total success count |
 +++
 
+Do we have enough information here to generate values?
 
-
-
-
-
-
+```scala
+def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
+```
+- Hard to know without a closer look at Gen |
 
 
 ---
+
+
+#### Meaning and API of Generators
+
+```scala
+Gen[A]
+```
+- Knows how to generate values of type A
+- Do we know a way to randomly generate values in a purely functional way?
+- How can we represent it?
++++
 #### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
++++
+#### A representation for Gen
+```scala
+case class Gen[A](sample: State[RNG, A])
+```
+It simply wraps `State[RNG,A]` so combinators should be simple delegations to State
++++
+### Exercise 8.4
+#### Implement choose using this representation of Gen
+```scala
+def choose(start: Int, stopExclusive: Int): Gen[Int]
+```
++++
+### Exercise 8.5
+#### Try implementing `unit`, `boolean`, `listOfN`
+```scala
+// always generates value a
+def unit[A](a: => A):Gen[A]
 
+def boolean: Gen[Boolean]
+
+// generates lists of length n using generator g
+def listOfN[A](n: Int, g: Gen[A]): Gen[List[A]]
+```
++++
+#### Think about what is primitive or derived
+- If we can generate a single `Int` in some range do we need a new primitive for `(Int,Int)` pair? |
+- Can we produce `Gen[Option[A]]` from a `Gen[A]`? |
+- Can we generate strings using existing primitives? |
+
+---
+### Generators that depend on generated values
+
+```scala
+// generates pairs of strings - second contains chars from first
+val strCharPairs : Gen[(String, String)]
+
+
+val listLengthGenerator: Gen[Int]
+
+val doubleLists: Gen[List[Double]] //generates lists of lengths from listLengthGenerator
+```
+How can we combine them?
+
++++
+#### Looks like we could use a
+`flatMap`...
++++
+### Exercise 8.6
+#### Implement `flatMap` and a dynamic listOfN
+```scala
+class Gen[A] {
+  ...
+  def flatMap[B](f: A => Gen[B]): Gen[B]
+
+  def listOfN(size: Gen[Int]): Gen[List[A]]
+
+}
+```
+
++++
 
 ```python
 from time import localtime
