@@ -259,7 +259,6 @@ def choose(start: Int, stopExclusive: Int): Gen[Int]
 ```scala
 // always generates value a
 def unit[A]​(a: => A): Gen[A]​
-def unit[A](a: => A):Gen[A]
 
 def boolean: Gen[Boolean]
 
