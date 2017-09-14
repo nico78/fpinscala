@@ -263,7 +263,8 @@ def unit[A]​(a: => A): Gen[A]​
 def boolean: Gen[Boolean]
 
 // generates lists of length n using generator g
-def listOfN[A](n: Int, g: Gen[A]): Gen[List[A]]
+def listOfN[A]​(n: Int, g: Gen[A]): Gen[List[A]]​
+
 ```
 +++
 #### Think about what is primitive or derived
