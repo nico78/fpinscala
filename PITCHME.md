@@ -290,12 +290,12 @@ How can we combine them?
 `flatMap`...
 +++
 ### Exercise 8.6
-#### Implement `flatMap` and a dynamic listOfN
+#### Implement flatMap and a dynamic listOfN
 ```scala
 case class Gen[A] (sample: State[RNG, A]) {
   ...
   def flatMap[B](f: A => Gen[B]): Gen[B]
-
+  
   def listOfN(size: Gen[Int]): Gen[List[A]]
 
 }
