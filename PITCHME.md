@@ -310,6 +310,8 @@ case class Gen[A] (sample: State[RNG, A]) {
 ```scala
 case class Gen[A] (sample: State[RNG, A]) {
   ...
+  def union[A]​(g1: Gen[A], g1: Gen[A]): Gen[A]
+
   def union[A](g1: Gen[A], g2: Gen[A]]): Gen[A]
 }
 ```
