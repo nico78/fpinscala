@@ -26,10 +26,7 @@ runs tests to ensure that programs behave as specified
 ![Logo2](assets/haskellLogo.png)
 - ScalaCheck
 ![Logo3](assets/scalacheck.png)
----
-### A brief tour of property-based testing
 
-![Press Down Key](assets/down-arrow.png)
 +++
 ```scala
 val intList = Gen.listOf(Gen.choose(0,100))
@@ -60,30 +57,6 @@ scala> failingProp.check
 > ARG_0: List(0, 1)
 ```
 +++
-### Generators, predicates & properties
-![Logo](assets/generatorsProperties.png)
-###### Gen generates a variety of objects to pass to a Boolean expression searching for one that makes it false
-+++
-### Exercise 8.1
-#### What properties specify sum?
-```scala
-sum: List[Int] => Int
-```
-- Reversing a list and summing it should give the same result as summing the original nonreversed list |
-- What should the sum be if all elements of the list are the same value? |
-Note:
-just high-level description
-+++
-### Exercise 8.2
-#### What about max?
-```scala
-max: List[Int] => Int
-```
-- The max of the empty list is unspecified and should throw an error or return None |
-- The max of a single element list is equal to that element. |
-- The max of a list is greater than or equal to all elements of the list. |
-- The max of a list is an element of that list. |
-+++
 ### Other features
 - Test case minimization
 - Exhaustive test case generation
@@ -111,95 +84,15 @@ See [Choosing properties for property-based testing](http://fsharpforfunandprofi
 - test oracle (test vs another implementation) |
 
 
----
-
-
-### Choosing data types and functions
-
-![Press Down Key](assets/down-arrow.png)
-+++
-The messy and iterative process of discovering data types and functions for our library
-
-#### Initial snippets of the API
-##### What data types should we use?
-```scala
-val intList = Gen.listOf(Gen.choose(0,100))
-val prop =
- forAll(intList)(ns => ns.reverse.reverse == ns) &&
- forAll(intList)(ns => ns.headOption == ns.reverse.lastOption)
-```
-@[1](Looks like these should be choose: `Gen[Int]` , listOf: `Gen[List[Int]]`)
-+++
-#### Gen
-Let's make `listOf` polymorphic
-```scala
-def listOf[A]​(a: Gen[A]): Gen[List[A]]
-```
-- But we can see from signature that it can't be told the size... |
-+++
-listOf with size:
-```scala
-def listOfN[A]​(n: Int, a: Gen[A]): Gen[List[A]]
-```
-- useful to have this, but we might not want to have to specify it |
-- probably don't want size to be exposed to user, just test runner, for minimization|
-- will keep it in mind... |
 +++
 
 #### What about forAll ?
-We can define signature:
+
 ```scala
 def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
 ```
-so a **Prop** binds a **Gen** to a **predicate**
+a **Prop** binds a **Gen** to a **predicate**
 
-Note:
-The forAll function looks interesting. We
-can see that it accepts a Gen[List[Int]] and what looks to be a corresponding predi-
-cate, List[Int] => Boolean . But again, it doesn’t seem like forAll should care about
-the types of the generator and the predicate, as long as they match up. We can express
-this with the type:
-
-
----
-
-
-#### Meaning and API of properties
-We don't know what **Prop** will look like yet but we know it needs an **&&** combinator
-```scala
-trait Prop {def &&(p: Prop): Prop }
-```
-+++
-#### Prop
-... and we know it needs **check**
-```scala
-trait Prop {
-  def check: Unit
-  def &&(p: Prop): Prop
-}
-```
-- .. But because it returns **Unit**, the only option for **&&** is to run both **check** methods |
-- which would suck |
-+++
-.. so let's try returning Boolean..
-```scala
-trait Prop {
-  def check: Boolean
-  def &&(p: Prop): Prop
-}
-```
-### Exercise 8.3
-#### Implement && on Prop
-+++
-
-```scala
-object Prop {
-  type SuccessCount = Int
-  ...
-}
-trait Prop { def check: Either[???, SuccessCount] }
-```
-@[2](Alias helps readability of API)
 +++
 
 ```scala
@@ -227,7 +120,7 @@ def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
 - Hard to know without a closer look at Gen |
 
 
----
++++
 
 
 #### Meaning and API of Generators
@@ -239,9 +132,7 @@ Gen[A]
 - Do we know a way to randomly generate values in a purely functional way?
 - How can we represent it?
 +++
-#### Remember Irek's [Purely functional state ?](https://docs.google.com/presentation/d/1Q1DfELS6b2xTfvRYDx0VQRhpTX8c2085ScbvUjsfn6I/edit#slide=id.g2316352f05_0_99)  
 
-+++
 #### A representation for Gen
 ```scala
   case class Gen[A] (sample: State[RNG, A])
@@ -254,9 +145,10 @@ It simply wraps `State[RNG,A]` so combinators should be simple delegations to St
 def choose(start: Int, stopExclusive: Int): Gen[Int]
 ```
 +++
-### Exercise 8.5
-#### Try implementing `unit`, `boolean`, `listOfN`
+
+#### Implementations of `unit`, `boolean`, `listOfN`, `choose`
 ```scala
+TODO
 // always generates value a
 def unit[A]​(a: => A): Gen[A]​
 
@@ -267,63 +159,16 @@ def listOfN[A]​(n: Int, g: Gen[A]): Gen[List[A]]​
 
 ```
 +++
-#### Think about what is primitive or derived
-- If we can generate a single `Int` in some range do we need a new primitive for `(Int,Int)` pair? |
-- Can we produce `Gen[Option[A]]` from a `Gen[A]`? |
-- Can we generate strings using existing primitives? |
 
----
-### Generators that depend on generated values
-
+#### Implementation of flatMap and a dynamic listOfN, union, weigthed
 ```scala
-// generates pairs of strings
-// second contains chars from first
-val strCharPairs : Gen[(String, String)]
-
-
-val listLengthGenerator: Gen[Int]
-
-//generates lists of lengths
-//from listLengthGenerator
-val doubleLists: Gen[List[Double]]
-```
-How can we combine them?
-
-+++
-#### Looks like we could use a
-`flatMap`...
-+++
-### Exercise 8.6
-#### Implement flatMap and a dynamic listOfN
-```scala
+TODO
 case class Gen[A] (sample: State[RNG, A]) {
   ...
   def flatMap[B]​(f: A => Gen[B]): Gen[B]
 
   def listOfN(size: Gen[Int]): Gen[List[A]]
 
-}
-```
-+++
-### Exercise 8.7
-#### Implement `union` - pulls from each with equal likelihood
-```scala
-case class Gen[A] (sample: State[RNG, A]) {
-  ...
-  def union[A]​(g1: Gen[A], g1: Gen[A]): Gen[A]
-}
-```
-+++
-### Exercise 8.8
-#### Implement `weighted`
-A version of union that accepts a weight for each Gen and generates values from each Gen with probability proportional to its weight.
-
-```scala
-case class Gen[A] (sample: State[RNG, A]) {
-  ...
-  def weighted[A]​(g1: (Gen[A], Double),
-                 g2: (Gen[A], Double)
-               ): Gen[A]
 }
 ```
 ---
@@ -355,3 +200,236 @@ What's missing?
 - We don't know how to specify what constitutes "success" - "how many test cases need to pass"? |
 - rather than hardcode, we'll abstract over the dependency:
 +++
+Abstracting over number of required test cases:
+```scala
+type TestCases = Int
+type Result = Either[(FailedCase, SuccessCount), SuccessCount]​
+case class Prop(check: TestCases => Result)
+```
+@[2](We don't really need SuccessCount on RHS of Either any more)
++++
+Abstracting over number of required test cases:
+```scala
+type TestCases = Int
+type Result = Option[(FailedCase, SuccessCount)]​
+case class Prop(check: TestCases => Result)
+```
+@[2](But now `None` will mean it passed... bit weird.. create a new type)
++++
+```scala
+sealed trait Result {
+  def isFalsified: Boolean
+}
+case object Passed extends Result {
+  def isFalsified = false
+}
+
+case class Falsified(
+  failure: FailedCase,
+  successes: SuccessCount) extends Result {
+  def isFalsified = true
+}
+```
+@[4](Indicates that all tests passed)
+@[8](Indicates that one of the test cases falsified the property)
+
++++
+### forall again
+```scala
+def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
+
+```
+forAll doesn’t have enough information to return a Prop
+- needs number of test cases to try |
+- needs an RNG
+
++++
+So we'll add dependency to `Prop` :
+```scala
+case class Prop(check: TestCases => Result)
+```
+becomes:
+```scala
+case class Prop(check: (TestCases,RNG) => Result)
+```
+Note:
+If we think of other dependencies that it might need, besides the number of test
+cases and the source of randomness, we can just add these as extra parameters to
+Prop.run later.
+
++++
+### Implementing forall
+turning `Gen` into a random `Stream`:
+```scala
+def randomStream[A](g: Gen[A]​)(rng: RNG): Stream[A] =
+   Stream.unfold(rng)(rng => Some(g.sample.run(rng)))
+```
+@[2](Generates an infinite stream of A values by repeatedly sampling a generator.)
+
++++
+```scala
+def forAll[A]​(as: Gen[A])(f: A => Boolean): Prop = Prop {
+  (n,rng) => randomStream(as)(rng).zip(Stream.from(0)).take(n).map {
+    case (a, i) => try {
+      if (f(a)) Passed else Falsified(a.toString, i)
+    } catch { case e: Exception => Falsified(buildMsg(a, e), i) }
+  }.find(_.isFalsified).getOrElse(Passed)
+```
+@[2](A stream of pairs `a,i` where `a` is a random value and i is its index in the stream.)
+@[4](When a test fails, record failed case & index: how many succeeded before failure)
+@[5](If a test case generates an exception, record it in the result.)
++++
+```scala
+def buildMsg[A]​(s: A, e: Exception): String =
+   s"generated an exception: ${e.getMessage}\n" +
+   s"test case: $s\n" +
+   s"stack trace:\n ${e.getStackTrace.mkString("\n")}"
+```
++++
+### Exercise 8.9
+#### implement && and || for the new Prop
+```scala
+  def &&(p: Prop): Prop
+  def ||(p: Prop): Prop
+```
+Can we find a way to assign a label so we know which property failed?
+
+---
+
+### Test case minimization
+
+![Press Down Key](assets/down-arrow.png)
++++
+Find the smallest or simplest failing test case to illustrate the problem.
+Two approaches:
+- Shrinking - once a failure found, reduce size till stops failing|
+- Sized generation - start small|
+- we'll use sized generation - simpler - but most libs use shrinking |
+Note:
+shrinking:
+requires us to write separate
+code for each data type to implement this minimization process.
+ Sized:
+Rather than shrinking test cases after the fact, we simply gener-
+ate our test cases in order of increasing size and complexity. So we start small
+and increase the size until we find a failure. This idea can be extended in vari-
+ous ways to allow the test runner to make larger jumps in the space of possible
+sizes while still making it possible to find the smallest failing test.
+
+will use sized since avoids having to implement search in space of test cases
++++
+A new type for sized generation:
+```scala
+  case class SGen[+A]​(forSize: Int => Gen[A])
+```
+@[1](Takes a size, produces a generator for that size)
++++
+### Exercise 8.10/11
+#### Implement helper functions for converting Gen to SGen
+```scala
+  def unsized: SGen[A]​
+```
+and include convenience functions on SGen that simply delegate to the corresponding
+ functions on Gen
+++
+### Exercise 8.12
+#### Implement listOf combinator that doesn’t accept an explicit size.
+```scala
+  def listOf[A](g: Gen[A]): SGen[List[A]​]
+```
+The implementation should generate lists of the requested size.
+
+---
+### The sized version of forall
+```scala
+/*was*/ def forAll[A]​(as: Gen[A])(f: A => Boolean): Prop
+/*now*/ def forAll[A](g: SGen[A])(f: A => Boolean): Prop
+```
+@[2](Impossible to implement:  SGen is expecting a size, but Prop doesn’t receive any size information.)
+Note:
+we want to put Prop in charge of invoking the underlying generators with various sizes,so we’ll have Prop accept a maximum size
++++
+### Enhancing prop with MaxSize
+
+```scala
+case class Prop(check: (TestCases,RNG) => Result)
+```
+becomes:
+```scala
+type MaxSize = Int
+case class Prop(run: (MaxSize,TestCases,RNG) => Result)
+```
++++
+
+```scala
+def forAll[A](g: Int => Gen[A])(f: A => Boolean): Prop = Prop {
+  (max,n,rng) =>
+   val casesPerSize = (n + (max - 1)) / max
+   val props: Stream[Prop] =
+     Stream.from(0).take((n min max) + 1).map(i => forAll(g(i))(f))
+   val prop: Prop =
+     props.map(p => Prop { (max, _, rng) =>
+       p.run(max, casesPerSize, rng)
+     }).toList.reduce(_ && _)
+   prop.run(max,n,rng)
+```
+@[3](For each size generate this many random cases)
+@[5](Make one property per size, but no more than n properties.)
+@[9](Combine into one property)
+
+---
+###Trying to use the API
+
+![Press Down Key](assets/down-arrow.png)
++++
+###Trying with max
+```scala
+val smallInt = Gen.choose(-10,10)
+val maxProp = forAll(listOf(smallInt)) { ns =>
+  val max = ns.max
+  !ns.exists(_ > max)
+}
+maxProp.run(maxSize = 100, testCases = 100,
+  rng = RNG.Simple(System.currentTimeMillis))
+```
+@[4](No value greater than max should exist in ns)
+@[6](A bit cumbersome to run...)
+
+---
+### a run helper
+
+```scala
+def run(p: Prop,
+        maxSize: Int = 100,
+        testCases: Int = 100,
+        rng: RNG = RNG.Simple(System.currentTimeMillis)): Unit =
+  p.run(maxSize, testCases, rng) match {
+    case Falsified(msg, n) =>
+      println(s"! Falsified after $n passed tests:\n $msg")
+    case Passed =>
+      println(s"+ OK, passed $testCases tests.")
+  }
+```
++++
+### running it
+
+```scala
+  run(maxProp)
+```
+TODO run this code in idea
+
++++
+### Exercise 8.13
+Define `listOf1` for generating nonempty lists, and then update your specification of
+max to use this generator.
++++
+### Exercise 8.14
+Write a property to verify the behavior of `List.sorted`
+For instance, `List(2,1,3).sorted` is equal to `List(1,2,3)``
+---
+### Writing a test suite for parallel computations
+![Press Down Key](assets/down-arrow.png)
++++
+
+
+  SPECIAL: [A]​
