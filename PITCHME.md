@@ -21,13 +21,6 @@ The framework then automatically generates test cases that satisfy these constra
 runs tests to ensure that programs behave as specified
 
 +++
-
-- Haskell QuickCheck
-![Logo2](assets/haskellLogo.png)
-- ScalaCheck
-![Logo3](assets/scalacheck.png)
-
-+++
 ```scala
 val intList = Gen.listOf(Gen.choose(0,100))
 val prop =
@@ -40,151 +33,11 @@ val prop =
 @[4](Check that the first element becomes the last element after reversal.)
 +++
 
-```scala
-scala> prop.check
-OK, passed 100 tests
-```
-+++
-```scala
-val failingProp = forAll(intList)(ns => ns.reverse == ns)
-```
-A property that is obviously false
-+++
-
-```scala
-scala> failingProp.check
-! Falsified after 6 passed tests.
-> ARG_0: List(0, 1)
-```
-+++
-### Other features
-- Test case minimization
-- Exhaustive test case generation
-Note:
-- Test case minimization—In the event of a failing test, the framework tries smaller
-sizes until it finds the smallest test case that also fails, which is more illuminating
-for debugging purposes. For instance, if a property fails for a list of size 10, the
-framework tries smaller lists and reports the smallest list that fails the test.
-- Exhaustive test case generation—We call the set of values that could be produced
-by some Gen[A] the domain. 2 When the domain is small enough (for instance, if
-it’s all even integers less than 100), we may exhaustively test all its values, rather
-than generate sample values. If the property holds for all values in a domain, we
-have an actual proof, rather than just the absence of evidence to the contrary.
-
-+++
-
-### Choosing properties
-
-See [Choosing properties for property-based testing](http://fsharpforfunandprofit.com/posts/property-based-testing-2/)
-- "Different paths, same destination" - combining operations in different orders |
-- "There and back again" - reversing operations |
-- Checking invariants |
-- Idempotence |
-- "Hard to prove, easy to verify" - maze solution checker |
-- test oracle (test vs another implementation) |
-
-
-+++
-
-#### What about forAll ?
-
+### forall
 ```scala
 def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
 ```
-a **Prop** binds a **Gen** to a **predicate**
-
-+++
-
-```scala
-object Prop {
-  type FailedCase = String
-  type SuccessCount = Int
-}
-```
-@[2](A String representation will do for a failure)
-+++
-```scala
-trait Prop {
-  def check: Either[(FailedCase, SuccessCount), SuccessCount]
-}```
-returns either:
-- Failure case description and Success count before failure, |
-- or just total success count |
-+++
-
-Do we have enough information here to generate values?
-
-```scala
-def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
-```
-- Hard to know without a closer look at Gen |
-
-
-+++
-
-
-#### Meaning and API of Generators
-
-```scala
-Gen[A]
-```
-- Knows how to generate values of type A
-- Do we know a way to randomly generate values in a purely functional way?
-- How can we represent it?
-+++
-
-#### A representation for Gen
-```scala
-  case class Gen[A] (sample: State[RNG, A])
-```
-It simply wraps `State[RNG,A]` so combinators should be simple delegations to State
-+++
-### Exercise 8.4
-#### Implement choose using this representation of Gen
-```scala
-def choose(start: Int, stopExclusive: Int): Gen[Int]
-```
-+++
-
-#### Implementations of `unit`, `boolean`, `listOfN`, `choose`
-```scala
-TODO
-// always generates value a
-def unit[A]​(a: => A): Gen[A]​
-
-def boolean: Gen[Boolean]
-
-// generates lists of length n using generator g
-def listOfN[A]​(n: Int, g: Gen[A]): Gen[List[A]]​
-
-```
-+++
-
-#### Implementation of flatMap and a dynamic listOfN, union, weigthed
-```scala
-TODO
-case class Gen[A] (sample: State[RNG, A]) {
-  ...
-  def flatMap[B]​(f: A => Gen[B]): Gen[B]
-
-  def listOfN(size: Gen[Int]): Gen[List[A]]
-
-}
-```
----
 ### Back to Prop
-
-Currently our **Prop** looks like this:
-
-```scala
-trait Prop {
-  def check: Either[(FailedCase, SuccessCount), SuccessCount]
-}```
-
-Any trait that implements a single no-args method returning **A** is equivalent to a non-strict (lazy) **A**)
-+++
-### Back to Prop
-
 
 ```scala
 trait Prop {
