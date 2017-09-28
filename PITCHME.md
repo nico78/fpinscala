@@ -3,14 +3,14 @@
 
 ---
 
-### Property-Based Testing
+### Property-Based Testing - RECAP
 
 ### What is it?
 
 ![Press Down Key](assets/down-arrow.png)
 
 +++
-- Technique for testing **laws** or **invariants** about the behaviour of your code |
+- Technique for testing **laws** or _invariants_ about the behaviour of your code |
 - Decoupling specification of program behaviour from creation of test cases |
 +++
 - The programmer focuses on specifying domain, behaviour and high-level constraints |
@@ -33,22 +33,25 @@ val prop =
 @[4](Check that the first element becomes the last element after reversal.)
 +++
 
-### forall
+### current definitions
+forall
 ```scala
 def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
 ```
-### Back to Prop
+Prop
+```scala
+trait Prop {
+  def run: Either[(FailedCase, SuccessCount), SuccessCount]
+}```
+Gen
+```scala
+case class Gen[A] (sample: State[RNG, A])
+```
++++
+**Prop** is currently a lazy Either
 
 ```scala
-trait Prop {
-  def check: Either[(FailedCase, SuccessCount), SuccessCount]
-}```
-so **Prop** is currently a lazy Either |
-+++
-```scala
-trait Prop {
-  def check: Either[(FailedCase, SuccessCount), SuccessCount]
-}```
+trait Prop {check
 What's missing?
 - We don't know how to specify what constitutes "success" - "how many test cases need to pass"? |
 - rather than hardcode, we'll abstract over the dependency:
@@ -57,7 +60,7 @@ Abstracting over number of required test cases:
 ```scala
 type TestCases = Int
 type Result = Either[(FailedCase, SuccessCount), SuccessCount]​
-case class Prop(check: TestCases => Result)
+case class Prop(run: TestCases => Result)
 ```
 @[2](We don't really need SuccessCount on RHS of Either any more)
 +++
@@ -65,7 +68,7 @@ Abstracting over number of required test cases:
 ```scala
 type TestCases = Int
 type Result = Option[(FailedCase, SuccessCount)]​
-case class Prop(check: TestCases => Result)
+case class Prop(run: TestCases => Result)
 ```
 @[2](But now `None` will mean it passed... bit weird.. create a new type)
 +++
@@ -99,11 +102,11 @@ forAll doesn’t have enough information to return a Prop
 +++
 So we'll add dependency to `Prop` :
 ```scala
-case class Prop(check: TestCases => Result)
+case class Prop(run: TestCases => Result)
 ```
 becomes:
 ```scala
-case class Prop(check: (TestCases,RNG) => Result)
+case class Prop(run: (TestCases,RNG) => Result)
 ```
 Note:
 If we think of other dependencies that it might need, besides the number of test
@@ -205,7 +208,7 @@ we want to put Prop in charge of invoking the underlying generators with various
 ### Enhancing prop with MaxSize
 
 ```scala
-case class Prop(check: (TestCases,RNG) => Result)
+case class Prop(run: (TestCases,RNG) => Result)
 ```
 becomes:
 ```scala
@@ -283,6 +286,149 @@ For instance, `List(2,1,3).sorted` is equal to `List(1,2,3)``
 ### Writing a test suite for parallel computations
 ![Press Down Key](assets/down-arrow.png)
 +++
+### Recall computation laws
+how would we express:
+```scala
+map(unit(1))(_ + 1) == unit(2)
+```
+doable but ugly:
+```scala
+  val ES: ExecutorService = Executors.newCachedThreadPool
+  val p1 = Prop.forAll(Gen.unit(Par.unit(1)))(i =>
+  Par.map(i)(_ + 1)(ES).get == Par.unit(2)(ES).get)
+```
+Note:
+we've muddied the idea of the test with other details
+
+Also, we aren't varying the input we just have a hardcoded example.
+
++++
+### Proving properties
+
+To improve, note `forAll` is too general
+
+A combinator for hardcoded examples
+```scala
+def check(p: => Boolean): Prop = {
+  lazy val result = p
+  forAll(unit(()))(_ => result)
+}
+```
+@[1](Non-strict here)
+@[2](memoized to avoid recomputation.. but test runner will still run multiple times)
+
++++
+e.g.
+```scala
+run(check(true))
+```
+@[1](will test property 100 times)
+
+Need a new primitive...
++++
+Prop is currently:
+
+```scala
+case class Prop(run: (MaxSize,TestCases,RNG) => Result)
+```
+@[1](Result: Passed | Falsified)
+
+so `check` could be:
+
+```scala
+def check(p: => Boolean): Prop = Prop { (_, _, _) =>
+  if (p) Passed else Falsified("()", 0)
+}
+```
+- We need a new kind of `Result`...|
+Note:
+This is certainly better than using forAll , but run(check(true)) will still print “passed
+100 tests” even though it only tests the property once. It’s not really true that such a
+property has “passed” in the sense that it remains unfalsified after a number of tests. It
+is proved after just one test.
+
++++
+```scala
+case object Proved extends Result
+```
+
+```scala
+def check(p: => Boolean): Prop = Prop { (_, _, _) =>
+  if (p) Proved else Falsified("()", 0)
+}
+```
++++
+
+```scala
+def run(p: Prop,
+        maxSize: Int = 100,
+        testCases: Int = 100,
+        rng: RNG = RNG.Simple(System.currentTimeMillis)): Unit =
+  p.run(maxSize, testCases, rng) match {
+    case Falsified(msg, n) =>
+      println(s"! Falsified after $n passed tests:\n $msg")
+    case Passed =>
+      println(s"+ OK, passed $testCases tests.")
+      //new:
+    case Proved =>
+      println(s"+ OK, proved property.")
+  }
+```
++++
+### Exercise 8.15
+
+Some `forall` properties can be proven as well as `check` ones.
+Take a look at https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/testing/Exhaustive.scala
+for automatically proving our code correct.
+
+---
+### Back to Testing Par
+Proving that
+```scala
+Par.map(Par.unit(1))(_ + 1) == Par.unit(2)
+```
+
+```scala
+  val pp = Prop.check {
+    val p = Par.map(Par.unit(1))(_ + 1)
+    val p2 = Par.unit(2)
+    p(ES).get == p2(ES).get
+  }
+```
+Note:
+still a bit ugly to be using `.get`
+
++++
+so `lift` equality comparison to `Par`:
+
+```scala
+def equal[A](p: Par[A], p2: Par[A]): Par[Boolean] =
+  Par.map2(p,p2)(_ == _)
+
+val p3 = check {
+  equal(
+   Par.map(Par.unit(1))(_ + 1),
+   Par.unit(2)
+  )(ES).get
+}
+```
++++
+... and we can just move running of Par out:
+```scala
+def forAllPar[A]​(g: Gen[A])(f: A => Par[Boolean])
+```
+... and add some variation across parallel strategies:
+```scala
+val S = weighted(
+  choose(1,4).map(Executors.newFixedThreadPool) -> .75,
+  unit(Executors.newCachedThreadPool) -> .25
+)
+
+def forAllPar[A]​(g: Gen[A])(f: A => Par[Boolean]): Prop =
+  forAll(S.map2(g)((_,_))) { case (s,a) => f(a)(s).get }
+```
+@[2](This generator creates a fixed thread pool executor 75% of the time and an unbounded one 25% of the time.)
+
 
 
   SPECIAL: [A]​
