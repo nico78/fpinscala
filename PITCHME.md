@@ -5,8 +5,6 @@
 
 ### Property-Based Testing - RECAP
 
-### What is it?
-
 ![Press Down Key](assets/down-arrow.png)
 
 +++
@@ -51,11 +49,19 @@ case class Gen[A] (sample: State[RNG, A])
 **Prop** is currently a lazy Either
 
 ```scala
-trait Prop {check
+trait Prop {
+  def check: Either[(FailedCase, SuccessCount), SuccessCount]
+}```
 What's missing?
 - We don't know how to specify what constitutes "success" - "how many test cases need to pass"? |
 - rather than hardcode, we'll abstract over the dependency:
+
+---
+### Our API - Continuing
+
+![Press Down Key](assets/down-arrow.png)
 +++
+
 Abstracting over number of required test cases:
 ```scala
 type TestCases = Int
@@ -97,7 +103,7 @@ def forAll[A]​(a: Gen[A])(f: A => Boolean): Prop
 ```
 forAll doesn’t have enough information to return a Prop
 - needs number of test cases to try |
-- needs an RNG
+- needs an RNG |
 
 +++
 So we'll add dependency to `Prop` :
@@ -117,7 +123,7 @@ Prop.run later.
 ### Implementing forall
 turning `Gen` into a random `Stream`:
 ```scala
-def randomStream[A](g: Gen[A]​)(rng: RNG): Stream[A] =
+def randomStream[A]​(g: Gen[A]​)(rng: RNG): Stream[A] =
    Stream.unfold(rng)(rng => Some(g.sample.run(rng)))
 ```
 @[2](Generates an infinite stream of A values by repeatedly sampling a generator.)
@@ -191,7 +197,7 @@ and include convenience functions on SGen that simply delegate to the correspond
 ### Exercise 8.12
 #### Implement listOf combinator that doesn’t accept an explicit size.
 ```scala
-  def listOf[A](g: Gen[A]): SGen[List[A]​]
+  def listOf[A]​(g: Gen[A]): SGen[List[A]​]
 ```
 The implementation should generate lists of the requested size.
 
