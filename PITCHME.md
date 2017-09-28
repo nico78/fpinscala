@@ -347,8 +347,8 @@ def check(p: => Boolean): Prop = Prop { (_, _, _) =>
 }
 ```
 @[1](Result: Passed | Falsified)
+@[3](We need a new kind of Result)
 
-- We need a new kind of `Result`...|
 Note:
 This is certainly better than using forAll , but run(check(true)) will still print “passed
 100 tests” even though it only tests the property once. It’s not really true that such a
