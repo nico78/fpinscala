@@ -193,7 +193,7 @@ A new type for sized generation:
 ```
 and include convenience functions on SGen that simply delegate to the corresponding
  functions on Gen
-++
++++
 ### Exercise 8.12
 #### Implement listOf combinator that doesn’t accept an explicit size.
 ```scala
@@ -205,7 +205,7 @@ The implementation should generate lists of the requested size.
 ### The sized version of forall
 ```scala
 /*was*/ def forAll[A]​(as: Gen[A])(f: A => Boolean): Prop
-/*now*/ def forAll[A](g: SGen[A])(f: A => Boolean): Prop
+/*now*/ def forAll[A]​(g: SGen[A])(f: A => Boolean): Prop
 ```
 @[2](Impossible to implement:  SGen is expecting a size, but Prop doesn’t receive any size information.)
 Note:
@@ -224,7 +224,7 @@ case class Prop(run: (MaxSize,TestCases,RNG) => Result)
 +++
 
 ```scala
-def forAll[A](g: Int => Gen[A])(f: A => Boolean): Prop = Prop {
+def forAll[A]​(g: Int => Gen[A])(f: A => Boolean): Prop = Prop {
   (max,n,rng) =>
    val casesPerSize = (n + (max - 1)) / max
    val props: Stream[Prop] =
@@ -240,11 +240,11 @@ def forAll[A](g: Int => Gen[A])(f: A => Boolean): Prop = Prop {
 @[9](Combine into one property)
 
 ---
-###Trying to use the API
+### Trying to use the API
 
 ![Press Down Key](assets/down-arrow.png)
 +++
-###Trying with max
+### Trying with max
 ```scala
 val smallInt = Gen.choose(-10,10)
 val maxProp = forAll(listOf(smallInt)) { ns =>
@@ -278,7 +278,7 @@ def run(p: Prop,
 ```scala
   run(maxProp)
 ```
-TODO run this code in idea
+Let's run this code...
 
 +++
 ### Exercise 8.13
@@ -293,10 +293,11 @@ For instance, `List(2,1,3).sorted` is equal to `List(1,2,3)``
 ![Press Down Key](assets/down-arrow.png)
 +++
 ### Recall computation laws
-how would we express:
+how would we express this?
 ```scala
 map(unit(1))(_ + 1) == unit(2)
 ```
++++
 doable but ugly:
 ```scala
   val ES: ExecutorService = Executors.newCachedThreadPool
@@ -313,7 +314,7 @@ Also, we aren't varying the input we just have a hardcoded example.
 
 To improve, note `forAll` is too general
 
-A combinator for hardcoded examples
+Introduce a combinator for hardcoded examples:
 ```scala
 def check(p: => Boolean): Prop = {
   lazy val result = p
@@ -330,14 +331,13 @@ run(check(true))
 ```
 @[1](will test property 100 times)
 
-Need a new primitive...
+- We need a new primitive... |
 +++
 Prop is currently:
 
 ```scala
 case class Prop(run: (MaxSize,TestCases,RNG) => Result)
 ```
-@[1](Result: Passed | Falsified)
 
 so `check` could be:
 
@@ -346,6 +346,8 @@ def check(p: => Boolean): Prop = Prop { (_, _, _) =>
   if (p) Passed else Falsified("()", 0)
 }
 ```
+@[1](Result: Passed | Falsified)
+
 - We need a new kind of `Result`...|
 Note:
 This is certainly better than using forAll , but run(check(true)) will still print “passed
