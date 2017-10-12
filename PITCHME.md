@@ -404,7 +404,7 @@ Par.map(Par.unit(1))(_ + 1) == Par.unit(2)
   }
 ```
 Note:
-still a bit ugly to be using `.get`
+still a bit ugly to be using `.get` plus it needs to know implementation details of Par to compare for equality
 
 +++
 so `lift` equality comparison to `Par`:
@@ -436,7 +436,3 @@ def forAllPar[A]​(g: Gen[A])(f: A => Par[Boolean]): Prop =
   forAll(S.map2(g)((_,_))) { case (s,a) => f(a)(s).get }
 ```
 @[2](This generator creates a fixed thread pool executor 75% of the time and an unbounded one 25% of the time.)
-
-
-
-  SPECIAL: [A]​
