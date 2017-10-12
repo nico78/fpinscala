@@ -12,16 +12,84 @@ import java.util.concurrent.{Executors,ExecutorService}
 The library developed in this chapter goes through several iterations. This file is just the
 shell, which you can fill in and modify while working through the chapter.
 */
+//
+//trait Prop { self =>
+//
+//  def check: Boolean
+//  def &&(p:Prop):Prop = {
+//    new Prop {
+//      def check = self.check && p.check
+//    }
+//  }
+//}
 
-trait Prop { self =>
+object Result {
+  type TestCases = Int
+  type FailedCase = String
+  type SuccessCount = Int
 
-  def check: Boolean
-  def &&(p:Prop):Prop = {
-    new Prop {
-      def check = self.check && p.check
+}
+import Result._
+sealed trait Result {
+  def isFalsified: Boolean
+}
+case object Passed extends Result {
+  def isFalsified = false
+}
+case class Falsified(failure: FailedCase,
+                     successes: SuccessCount) extends Result {
+  def isFalsified = true
+}
+
+
+
+
+case class Prop(run: (TestCases,RNG) => Result){
+
+  def tag(msg: String) = Prop {
+    (n, rng) => run(n, rng) match {
+      case Falsified(fc, sc) => Falsified(msg + "\n" + fc, sc)
+      case passed => passed
+    }
+  }
+  def &&(p:Prop): Prop = {
+    Prop{
+      (n, rng) =>
+        run(n, rng) match {
+          case Passed => p.run(n, rng)
+          case f => f
+        }
+    }
+  }
+  def ||(p:Prop): Prop = {
+    Prop{
+      (n, rng) =>
+        run(n, rng) match {
+          case Falsified(fc, sc) => p.tag(fc).run(n, rng)
+          case passed => passed
+        }
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -36,6 +104,9 @@ object Prop {
     Gen(State(RNG.nonNegativeInt).map(n => start + n % (stopExclusive - start))))
 
   def forAll[A](gen: Gen[A])(f: A => Boolean): Prop = ???
+
+
+  val sortedProp = forAll(Gen.list)
 
 }
 
@@ -62,6 +133,8 @@ object Gen {
     } yield v
   }
 
+
+
 }
 
 case class Gen[A](sample: State[RNG, A]) {
@@ -77,12 +150,44 @@ case class Gen[A](sample: State[RNG, A]) {
     n <- size
     l <- listOfN(n)
   } yield l
+
+  def unsized: SGen[A] = SGen(_ => this)
+
+  def map2[B,C](g: Gen[B])(f: (A,B) => C): Gen[C] =
+    Gen(sample.map2(g.sample)(f))
+
+  def **[B](g: Gen[B]): Gen[(A,B)] =
+    (this map2 g)((_,_))
 }
 
-trait SGen[+A] {
 
+case class SGen[A](forSize: Int => Gen[A]) {
+
+
+  def apply(n: Int): Gen[A] = forSize(n)
+  def map[B](f: A => B): SGen[B] = SGen(forSize andThen (_ map f))
+
+  def flatMap[B](f: A => SGen[B]): SGen[B] = SGen{ n =>
+    forSize(n).flatMap(f(_).forSize(n) )
+  }
+
+  def **[B](s2: SGen[B]): SGen[(A,B)] =
+    SGen(n => forSize(n) ** s2(n))
 }
 
+object SGen {
+
+  def listOf[A](g: Gen[A]): SGen[List[A]] =
+    SGen(n => g.listOfN(n))
+
+  def nonEmptyListOf[A](g: Gen[A]): SGen[List[A]] =
+    SGen(n => g.listOfN(n max 1))
+
+  val l = listOf[Double](Gen.double)
+
+  private val doubleListsLength32: Gen[List[Double]] = l.forSize(32)
+
+}
 
 
 
