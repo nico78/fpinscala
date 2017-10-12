@@ -401,7 +401,7 @@ still a bit ugly to be using `.get` plus it needs to know implementation details
 so `lift` equality comparison to `Par`:
 
 ```scala
-def equal[A](p: Par[A], p2: Par[A]): Par[Boolean] =
+def equal[A]​(p: Par[A], p2: Par[A]): Par[Boolean] =
   Par.map2(p,p2)(_ == _)
 
 val p3 = check {
