@@ -234,16 +234,7 @@ def forAll[A]​(g: Int => Gen[A])(f: A => Boolean): Prop = Prop {
        p.run(max, casesPerSize, rng)
      }).toList.reduce(_ && _)
    prop.run(max,n,rng)
-```
-@[3](For each size generate this many random cases)
-@[5](Make one property per size, but no more than n properties.)
-@[9](Combine into one property)
-
----
-### Trying to use the API
-
-![Press Down Key](assets/down-arrow.png)
-+++
+```]​(
 ### Trying with max
 ```scala
 val smallInt = Gen.choose(-10,10)
@@ -436,3 +427,18 @@ def forAllPar[A]​(g: Gen[A])(f: A => Par[Boolean]): Prop =
   forAll(S.map2(g)((_,_))) { case (s,a) => f(a)(s).get }
 ```
 @[2](This generator creates a fixed thread pool executor 75% of the time and an unbounded one 25% of the time.)
+
++++
+But is this a bit too noisy just to combine generators into a pair?
+```scala
+S.map2(g)((_,_))
+```
+How about:
+
+```scala
+def **[B]​(g: Gen[B]): Gen[(A,B)] =
+  (this map2 g)((_,_))
+
+def forAllPar[A](g: Gen[A])(f: A => Par[Boolean]): Prop =
+  forAll(S ** g) { case (s,a) => f(a)(s).get }
+```
