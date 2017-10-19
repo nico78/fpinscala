@@ -439,6 +439,190 @@ How about:
 def **[B]​(g: Gen[B]): Gen[(A,B)] =
   (this map2 g)((_,_))
 
-def forAllPar[A](g: Gen[A])(f: A => Par[Boolean]): Prop =
+def forAllPar[A]​(g: Gen[A])(f: A => Par[Boolean]): Prop =
   forAll(S ** g) { case (s,a) => f(a)(s).get }
+```
+
++++
+We can even use `**` as a custom extractor for `case` pattern match:
+
+```scala
+object ** {
+  def unapply[A,B]​(p: (A,B)) = Some(p)
+}
+
+def forAllPar[A]​(g: Gen[A])(f: A => Par[Boolean]): Prop =
+  forAll(S ** g) { case s ** a => f(a)(s).get }
+```
+
++++
+
+Now if we define:
+
+```scala
+def checkPar(p: Par[Boolean]​): Prop =
+  forAllPar(Gen.unit(()))(_ => p)
+```
+Our property looks a lot cleaner:
+
+```scala
+val p2 = checkPar {
+  equal (
+    Par.map(Par.unit(1))(_ + 1),
+    Par.unit(2)
+  )
+}
+```
+
++++
+### Other properties from Chapter 7
+
+We generalised:
+
+```scala
+map(unit(x))(f) == unit(f(x))
+```
+
+to:
+```scala
+map(y)(x => x) == y
+```
+
+@[2](We can't express this as it states equality holds for all choices of y, for all types)
+
++++
+we're forced to pick values for `y`:
+
+```scala
+val pint = Gen.choose(0,10) map (Par.unit(_))
+val p4 =
+  forAllPar(pint)(n => equal(Par.map(n)(y => y), n))
+```
+Note:
+We can certainly range over more choices of y , but what we have here is probably good
+enough. The implementation of map can’t care about the values of our parallel computation, so there isn’t much point in constructing the same test for Double , String ,
+and so on. What can affect map is the structure of the parallel computation. If we
+wanted greater assurance that our property held, we could provide richer generators
+for the structure. Here, we’re only supplying Par expressions with one level of nesting.
+
++++
+### Exercise 8.16
+Write a richer generator for `Par[Int]` which builds more deeply nested parallel computations
++++
+### Exercise 8.17
+Express the propery about `fork`:
+
+```scala
+  fork(x) == x
+```
+
+---
+### Testing higher-order functions and future directions
+![Press Down Key](assets/down-arrow.png)
++++
+- We don't currently have a way to test higher-order functions.|
+- We can generate data with generators but not functions |
++++
+e.g. we want to express that `takeWhile(f)` performs correctly for any `f` |
+```scala
+//pseudo-code:
+forall(functions ** lists){
+  case (f, l) => l.takeWhile(f).forall(f) == true
+}
+```
+@[2](any value in the list left after takewhile satisfies the predicate)
+
++++
+### Exercise 8.16
+Come up with some other properties that takeWhile should satisfy.
+Can you think of a good property expressing the relationship between takeWhile and dropWhile ?
+
++++
+We could start with a more specific property:
+
+```scala
+val isEven = (i: Int) => i%2 == 0
+val takeWhileProp =
+  Prop.forAll(Gen.listOf(int))(ns => ns.takeWhile(isEven).forall(isEven))
+```
+But how to generalise over other functions?
+
++++
+- Suppose we have a `Gen[Int]` and would like to produce a `Gen[String => Int]` |
+- we could produce String => Int functions that simply ignore their input string and delegate to the underlying Gen[Int] |
+- but that's not quite satisfactory - these are just constant functions
+
++++
+
+Let's start by looking at the signature of our motivating example, generating a function from `String => Int` given a `Gen[Int]`:
+
+```scala
+  def genStringInt(g: Gen[Int]): Gen[String => Int]
+```
++++
+
+And let's generalize this a bit to not be specialized to `Int`, because that would let us cheat a bit (by, say, returning the `hashCode` of the input `String`, which just so happens to be an `Int`).
+
+```scala
+def genStringFn[A](g: Gen[A]): Gen[String => A]
+```
+Note:
+We've already ruled out just returning a function that ignores the input `String`, since that's not very interesting!
+Instead, we want to make sure we _use information from_ the input `String` to influence what `A` we generate. How can we do that? Well, the only way we can have any influence on what value a `Gen` produces is to modify the `RNG` value it receives as input:
+
++++
+
+Recall our definition of `Gen`:
+
+```scala
+case class Gen[+A](sample: State[RNG,A])
+```
+
+Just by following the types, we can start writing:
+
+```scala
+def genStringFn[A](g: Gen[A]): Gen[String => A] = Gen {
+  State { (rng: RNG) => ??? }
+}
+```
+
+Where `???` has to be of type `(String => A, RNG)`, and moreover, we want the `String` to somehow affect what `A` is generated. We do that by modifying the seed of the `RNG` before passing it to the `Gen[A]` sample function. A simple way of doing this is to compute the hash of the input string, and mix this into the `RNG` state before using it to produce an `A`:
+
+```scala
+def genStringFn[A](g: Gen[A]): Gen[String => A] = Gen {
+  State { (rng: RNG) =>
+    val (seed, rng2) = rng.nextInt // we still use `rng` to produce a seed, so we get a new function each time
+    val f = (s: String) => g.sample.run(RNG.Simple(seed.toLong ^ s.hashCode.toLong))._1
+    (f, rng2)
+  }
+}
+```
+
+More generally, any function which takes a `String` and an `RNG` and produces a new `RNG` could be used. Here, we're computing the `hashCode` of the `String` and then XOR'ing it with a seed value to produce a new `RNG`. We could just as easily take the length of the `String` and use this value to perturn our RNG state, or take the first 3 characters of the string. The choices affect what sort of function we are producing:
+
+* If we use `hashCode` to perturb the `RNG` state, the function we are generating uses all the information of the `String` to influence the `A` value generated. Only input strings that share the same `hashCode` are guaranteed to produce the same `A`.
+* If we use the `length`, the function we are generating is using only some of the information of the `String` to influence the `A` being generated. For all input strings that have the same length, we are guaranteed to get the same `A`.
+
+The strategy we pick depends on what functions we think are realistic for our tests. Do we want functions that use all available information to produce a result, or are we more interested in functions that use only bits and pieces of their input? We can wrap the policy up in a `trait`:
+
+```scala
+trait Cogen[-A] {
+  def sample(a: A, rng: RNG): RNG
+}
+```
+
+As an exercise, try implementing a generalized version of `genStringFn`.
+
+```scala
+def fn[A,B](in: Cogen[A])(out: Gen[B]): Gen[A => B]
+```
+
+You can pattern the implementation after `genStringFn`. Just follow the types!
+
+One problem with this approach is reporting test case failures back to the user. In the event of a failure, all the user will see is that for some opaque function, the property failed, which isn't very enlightening. There's been work in the Haskell library [QuickCheck](http://www.cse.chalmers.se/~rjmh/QuickCheck/manual.html) to be able to report back to the user and even _shrink_ down the generated functions to the simplest form that still falsifies the property. See [this talk on shrinking and showing functions](https://www.youtube.com/watch?v=CH8UQJiv9Q4).
+
+
+
+```scala
+]​):
 ```
