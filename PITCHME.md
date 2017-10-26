@@ -575,13 +575,13 @@ Instead, we want to make sure we _use information from_ the input `String` to in
 Recall our definition of `Gen`:
 
 ```scala
-case class Gen[+A](sample: State[RNG,A])
+case class Gen[+A](sample: State[RNG,A]​)
 ```
 
 Just by following the types, we can start writing:
 
 ```scala
-def genStringFn[A](g: Gen[A]): Gen[String => A] = Gen {
+def genStringFn[A](g: Gen[A]​): Gen[String => A] = Gen {
   State { (rng: RNG) => ??? }
 }
 ```
@@ -589,7 +589,7 @@ def genStringFn[A](g: Gen[A]): Gen[String => A] = Gen {
 Where `???` has to be of type `(String => A, RNG)`, and moreover, we want the `String` to somehow affect what `A` is generated. We do that by modifying the seed of the `RNG` before passing it to the `Gen[A]` sample function. A simple way of doing this is to compute the hash of the input string, and mix this into the `RNG` state before using it to produce an `A`:
 
 ```scala
-def genStringFn[A](g: Gen[A]): Gen[String => A] = Gen {
+def genStringFn[A](g: Gen[A]​): Gen[String => A] = Gen {
   State { (rng: RNG) =>
     val (seed, rng2) = rng.nextInt // we still use `rng` to produce a seed, so we get a new function each time
     val f = (s: String) => g.sample.run(RNG.Simple(seed.toLong ^ s.hashCode.toLong))._1
@@ -606,7 +606,7 @@ More generally, any function which takes a `String` and an `RNG` and produces a 
 The strategy we pick depends on what functions we think are realistic for our tests. Do we want functions that use all available information to produce a result, or are we more interested in functions that use only bits and pieces of their input? We can wrap the policy up in a `trait`:
 
 ```scala
-trait Cogen[-A] {
+trait Cogen[-A]​ {
   def sample(a: A, rng: RNG): RNG
 }
 ```
@@ -614,7 +614,7 @@ trait Cogen[-A] {
 As an exercise, try implementing a generalized version of `genStringFn`.
 
 ```scala
-def fn[A,B](in: Cogen[A])(out: Gen[B]): Gen[A => B]
+def fn[A,B](in: Cogen[A]​)(out: Gen[B]): Gen[A => B]
 ```
 
 You can pattern the implementation after `genStringFn`. Just follow the types!
